@@ -10,9 +10,12 @@ import UIKit
 class ViewController: UIViewController {
     
     var timer = Timer()
+    var hideTimer = Timer()
     
     var countDown = 30
     var score = 0
+    
+    var kennies = [UIImageView]()
     
     
     @IBOutlet weak var timeLabel: UILabel!
@@ -65,7 +68,10 @@ class ViewController: UIViewController {
         kenny8.addGestureRecognizer(recognizer8)
         kenny9.addGestureRecognizer(recognizer9)
         
+        kennies = [kenny1, kenny2, kenny3, kenny4, kenny5, kenny6, kenny7, kenny8, kenny9]
+        
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(timerCountDown), userInfo: nil, repeats: true)
+        hideTimer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(hideKenny), userInfo: nil, repeats: true)
         
     }
 
@@ -76,10 +82,17 @@ class ViewController: UIViewController {
     }
     
     @objc func timerCountDown(){
-        if (countDown > 0){
-            countDown -= 1
-        } else {
+        
+        countDown -= 1
+        timeLabel.text = String(countDown)
+        
+        if (countDown == 0){
+            for kenny in kennies {
+                kenny.isHidden = true
+            }
             timer.invalidate()
+            hideTimer.invalidate()
+            
             let alert = UIAlertController(title: "Time's Up", message: "Do you want to play again", preferredStyle: .alert)
             let okButton = UIAlertAction(title: "OK", style: .cancel, handler:nil)
             let replayButton = UIAlertAction(title: "Replay", style: .default) { UIAlertAction in
@@ -89,9 +102,15 @@ class ViewController: UIViewController {
             alert.addAction(replayButton)
             self.present(alert, animated: true)
         }
-        
-        timeLabel.text = String(countDown)
        
+       
+    }
+    
+    @objc func hideKenny(){
+        for kenny in kennies {
+            kenny.isHidden = true
+        }
+        kennies.randomElement()?.isHidden = false
     }
 
 
