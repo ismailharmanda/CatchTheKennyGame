@@ -9,11 +9,14 @@ import UIKit
 
 class ViewController: UIViewController {
     
+    var defaults = UserDefaults()
+    
     var timer = Timer()
     var hideTimer = Timer()
     
-    var countDown = 30
+    var countDown = 10
     var score = 0
+    var highScore = 0
     
     var kennies = [UIImageView]()
     
@@ -35,6 +38,13 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        
+        if let safeHighScore = defaults.value(forKey: "highScore") as? Int{
+            highScore = safeHighScore 
+            highScoreLabel.text = "Highscore: \(safeHighScore)"
+        }
+        
+        var highScore = defaults.integer(forKey: "highScore")
         scoreLabel.text = "Score: \(score)"
         timeLabel.text = String(countDown)
         
@@ -92,13 +102,20 @@ class ViewController: UIViewController {
             }
             timer.invalidate()
             hideTimer.invalidate()
+            print(score,highScore)
+            if score > highScore {
+                highScore = score
+                highScoreLabel.text = "Highscore: \(highScore)"
+                defaults.setValue(highScore, forKey: "highScore")
+           
+            }
             
             let alert = UIAlertController(title: "Time's Up", message: "Do you want to play again", preferredStyle: .alert)
             let okButton = UIAlertAction(title: "OK", style: .cancel, handler:nil)
             let replayButton = UIAlertAction(title: "Replay", style: .default) { UIAlertAction in
                 self.score = 0
                 self.scoreLabel.text = "Score: \(self.score)"
-                self.countDown = 30
+                self.countDown = 10
                 self.timeLabel.text = String(self.countDown)
                 
                 self.timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.timerCountDown), userInfo: nil, repeats: true)
